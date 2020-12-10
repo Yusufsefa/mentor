@@ -3,8 +3,6 @@ var mysql = require('mysql');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
-//const dboperations = require('./dboperation');
-
 const config = require('./app_server/dbconfig');
 const path = require('path');
 
