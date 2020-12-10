@@ -1,7 +1,7 @@
-var routeMentor = require('./mentorRoutes');
+var routeAdmin = require('./adminRoutes');
 var routeStudent = require('./studentRoutes');
 
 module.exports = function(app) {
-    app.use('/mentor', routeMentor);
+    app.use('/admin', routeAdmin);
     app.use('/student', routeStudent);
 }
