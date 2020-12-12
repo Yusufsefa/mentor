@@ -150,15 +150,23 @@ module.exports.getProfileInfo = function(req, res) {
 };
 
 module.exports.updateProfile = function(req, res) {
-    var sql = 'SELECT * FROM questions'
+    var sql = 'UPDATE users u, students s SET u.ad = ?, u.soyad = ?, u.email = ?, u.password = ? , s.branchId = ? WHERE u.userId = s.userId AND s.studentId = ?';
     try {
-        config.query(sql, function(err, rows) {
-            if (err) throw err;
-            res.json(rows);
-        });
+        config.query(sql, [
+                req.body.ad,
+                req.body.soyad,
+                req.body.email,
+                req.body.password,
+                req.body.branchId,
+                req.params.studentId
+            ],
+            function(err, rows) {
+                if (err) throw err;
+                res.write('Updated...');
+                res.end();
+            });
 
     } catch (err) {
         throw err
     }
-
 };
