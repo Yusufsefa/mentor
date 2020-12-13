@@ -71,8 +71,8 @@ module.exports.getStudents = function (req, res) {
     WHERE s.userId=u.userId AND s.branchId=b.branchId AND s.mentorId=?`
     try {
         config.query(sql, [mentorId], (err, rows) => {
-            if(err) throw err;
-            if(rows.length > 0){
+            if (err) throw err;
+            if (rows.length > 0) {
                 res.json(rows[0])
             } else
                 res.status(404);
@@ -85,6 +85,24 @@ module.exports.getStudents = function (req, res) {
 }
 
 module.exports.getQuestions = function (req, res) {
+    var mentorId = req.params.mentorId;
+    var sql = `SELECT q.*, b.branchName FROM questions q, branchs b 
+    WHERE q.branchId=b.branchId AND q.mentorId=?`;
+    try {
+        config.query(sql, [mentorId], (err, rows) => {
+            if (err) throw err;
+            if (rows.length > 0)
+                res.json(rows);
+            else
+                res.status(404);
+            res.end();
+        });
+
+    } catch (err) {
+        res.status(500);
+        res.end();
+    }
+    
 
 }
 
