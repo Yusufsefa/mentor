@@ -102,12 +102,29 @@ module.exports.getQuestions = function (req, res) {
         res.status(500);
         res.end();
     }
-    
+
 
 }
 
 module.exports.answerQuestion = function (req, res) {
-
+    var questionId = req.body.questionId;
+    if (questionId) {
+        var answer = req.body.answer;
+        var sql = `UPDATE questions SET answer=? WHERE questionId=?`;
+        try {
+            config.query(sql, [answer, questionId], (err, rows) => {
+                if (err) throw err;
+                res.status(200);
+                res.end()
+            });
+        } catch (err) {
+            res.status(500);
+            res.end();
+        }
+    } else{
+        res.status(409);
+        res.end();
+    }
 }
 
 module.exports.getProfileInfo = function (req, res) {
