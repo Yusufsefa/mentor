@@ -7,10 +7,10 @@ var mentorController = require('../controller/mentorController');
 
 router.post('/login', mentorController.login);
 router.post('/register', mentorController.register);
-router.get('/:id/getStudents', mentorController.getStudents)
-router.get('/:id/getQuestions', mentorController.getQuestions)
+router.get('/:mentorId/getStudents', mentorController.getStudents)
+router.get('/:mentorId/getQuestions', mentorController.getQuestions)
 router.post('/answerQuestion', mentorController.answerQuestion)
-router.get('/:id/getProfileInfo', mentorController.getProfileInfo);
-router.post('/:id/updateProfile', mentorController.updateProfile);
+router.get('/:mentorId/getProfileInfo', mentorController.getProfileInfo);
+router.post('/:mentorId/updateProfile', mentorController.updateProfile);
 
 module.exports = router;
