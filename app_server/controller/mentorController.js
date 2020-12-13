@@ -5,10 +5,10 @@ var config = require('../dbconfig');
 req: username, password
 response: 200 - { kullaniciId }, 403 
 */
-module.exports.login = function (req, res) {
+module.exports.login = function(req, res) {
     var sql = 'SELECT m.mentorId FROM users u, mentors m WHERE u.email = ? AND u.password = ? AND u.userId = m.userId';
     try {
-        config.query(sql, [req.body.email, req.body.password], function (err, rows) {
+        config.query(sql, [req.body.email, req.body.password], function(err, rows) {
             if (err) throw err;
             if (rows.length > 0)
                 res.json(rows[0]);
@@ -26,7 +26,7 @@ module.exports.login = function (req, res) {
 req:
 response: 200
 */
-module.exports.register = function (req, res) {
+module.exports.register = function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
     var ad = req.body.ad;
@@ -61,7 +61,7 @@ module.exports.register = function (req, res) {
 
 
 
-module.exports.getStudents = function (req, res) {
+module.exports.getStudents = function(req, res) {
     var mentorId = req.params.mentorId;
     var sql = `SELECT 
     concat(u.ad, ' ',u.soyad) as 'ad soyad',
@@ -84,7 +84,7 @@ module.exports.getStudents = function (req, res) {
     }
 }
 
-module.exports.getQuestions = function (req, res) {
+module.exports.getQuestions = function(req, res) {
     var mentorId = req.params.mentorId;
     var sql = `SELECT q.*, b.branchName FROM questions q, branchs b 
     WHERE q.branchId=b.branchId AND q.mentorId=?`;
@@ -106,7 +106,7 @@ module.exports.getQuestions = function (req, res) {
 
 }
 
-module.exports.answerQuestion = function (req, res) {
+module.exports.answerQuestion = function(req, res) {
     var questionId = req.body.questionId;
     if (questionId) {
         var answer = req.body.answer;
@@ -121,16 +121,58 @@ module.exports.answerQuestion = function (req, res) {
             res.status(500);
             res.end();
         }
-    } else{
+    } else {
         res.status(409);
         res.end();
     }
 }
 
-module.exports.getProfileInfo = function (req, res) {
+module.exports.getProfileInfo = function(req, res) {
+    var mentorId = req.params.mentorId;
+    var sql = 'SELECT u.ad, u.soyad, u.email, u.password, m.description FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sqlBranch = 'SELECT b.branchName from mentorbranchs mb, branchs b WHERE mb.mentorId = ? AND b.branchId = mb.branchId';
+
+    try {
+        config.query(sql, [mentorId], (err, rows) => {
+            if (err) throw err;
+            if (rows.length > 0) {
+
+                config.query(sqlBranch, [mentorId], (err, rowsBranch) => {
+                    rows[0].branchs = rowsBranch;
+                    res.json(rows[0]);
+                    res.end();
+                });
+
+            } else {
+                res.status(404)
+            }
+        });
+
+    } catch (err) {
+        throw err;
+    }
 
 }
 
-module.exports.updateProfile = function (req, res) {
+module.exports.updateProfile = function(req, res) {
+    var sql = 'UPDATE users u, mentors m, mentorbranchs mb SET u.ad = ?, u.soyad = ?, u.email = ?, u.password = ? , m.description = ?, mb.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
+    try {
+        config.query(sql, [
+                req.body.ad,
+                req.body.soyad,
+                req.body.email,
+                req.body.password,
+                req.body.description,
+                req.body.branchId,
+                req.params.mentorId
+            ],
+            function(err, rows) {
+                if (err) throw err;
+                res.write('Updated...');
+                res.end();
+            });
 
+    } catch (err) {
+        throw err
+    }
 }
