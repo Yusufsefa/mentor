@@ -29,17 +29,17 @@ response: 200
 module.exports.register = function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
-    var ad = req.body.ad;
-    var soyad = req.body.soyad;
+    var Name = req.body.Name;
+    var LastName = req.body.LastName;
     var description = req.body.description;
-
+    
     try {
-        var sqlUser = 'INSERT INTO users(email, password, ad, soyad) VALUES (?,?,?,?)';
+        var sqlUser = 'INSERT INTO users(email, password, Name, LastName) VALUES (?,?,?,?)';
         var sqlLastId = 'SELECT MAX(userId) as "lastId" from users';
         var sqlMentor = 'INSERT INTO mentors(userId, description) VALUES (?,?)';
 
         // user table insert
-        config.query(sqlUser, [email, password, ad, soyad], (err, rows) => {
+        config.query(sqlUser, [email, password, Name, LastName], (err, rows) => {
             if (err) throw err;
             // get last userId
             config.query(sqlLastId, (err, rows2) => {
@@ -64,7 +64,7 @@ module.exports.register = function(req, res) {
 module.exports.getStudents = function(req, res) {
     var mentorId = req.params.mentorId;
     var sql = `SELECT 
-    concat(u.ad, ' ',u.soyad) as 'ad soyad',
+    concat(u.Name, ' ',u.LastName) as 'ad soyad',
     u.email,
     b.branchName
     FROM students s, users u, branchs b
@@ -129,7 +129,7 @@ module.exports.answerQuestion = function(req, res) {
 
 module.exports.getProfileInfo = function(req, res) {
     var mentorId = req.params.mentorId;
-    var sql = 'SELECT u.ad, u.soyad, u.email, u.password, m.description FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sql = 'SELECT u.Name, u.LastName, u.email, u.password, m.description FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
     var sqlBranch = 'SELECT b.branchName from mentorbranchs mb, branchs b WHERE mb.mentorId = ? AND b.branchId = mb.branchId';
 
     try {
@@ -155,11 +155,11 @@ module.exports.getProfileInfo = function(req, res) {
 }
 
 module.exports.updateProfile = function(req, res) {
-    var sql = 'UPDATE users u, mentors m, mentorbranchs mb SET u.ad = ?, u.soyad = ?, u.email = ?, u.password = ? , m.description = ?, mb.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sql = 'UPDATE users u, mentors m, mentorbranchs mb SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , m.description = ?, mb.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
     try {
         config.query(sql, [
-                req.body.ad,
-                req.body.soyad,
+                req.body.Name,
+                req.body.LastName,
                 req.body.email,
                 req.body.password,
                 req.body.description,
