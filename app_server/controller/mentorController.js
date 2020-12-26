@@ -31,14 +31,13 @@ module.exports.register = function(req, res) {
     var password = req.body.password;
     var Name = req.body.Name;
     var LastName = req.body.LastName;
-    var description = req.body.description;
+    var description = req.body.Description;
     var branchId = req.body.branchId;
 
     try {
-        var sqlUser = 'INSERT INTO users(email, password, Name, LastName) VALUES (?,?,?,?)';
+        var sqlUser = 'INSERT INTO users(email, password, name, lastName) VALUES (?,?,?,?)';
         var sqlLastId = 'SELECT MAX(userId) as "lastId" from users';
-        var sqlMentor = 'INSERT INTO mentors(userId, description) VALUES (?,?)';
-        var sqlBranch = 'INSERT INTO mentorbranchs(mentorId, branchId) VALUES (?,?)';
+        var sqlMentor = 'INSERT INTO mentors(userId, description, branchId) VALUES (?,?,?)';
 
         // user table insert
         config.query(sqlUser, [email, password, Name, LastName], (err, rows) => {
@@ -48,13 +47,10 @@ module.exports.register = function(req, res) {
                 if (err) throw err;
                 var lastId = JSON.stringify(rows2[0].lastId);
                 // mentor table insert
-                config.query(sqlMentor, [lastId, description], (err, rows3) => {
+                config.query(sqlMentor, [lastId, description, branchId], (err, rows3) => {
                     if (err) throw err;
-                    config.query(sqlBranch, [lastId, branchId], (err, rows4) => {
-                        if (err) throw err;
-                        res.status(200);
-                        res.end();
-                    });
+                    res.status(200);
+                    res.end();
                 });
             });
         });
