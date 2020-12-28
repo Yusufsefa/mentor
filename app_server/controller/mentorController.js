@@ -130,7 +130,7 @@ module.exports.answerQuestion = function(req, res) {
 
 module.exports.getProfileInfo = function(req, res) {
     var mentorId = req.params.mentorId;
-    var sql = 'SELECT u.Name, u.LastName, u.email, u.password, m.description FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sql = 'SELECT u.name, u.lastName, u.email, u.password, m.description, m.branchId FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
     var sqlBranch = 'SELECT b.branchName from mentorbranchs mb, branchs b WHERE mb.mentorId = ? AND b.branchId = mb.branchId';
 
     try {
