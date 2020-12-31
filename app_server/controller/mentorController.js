@@ -131,19 +131,12 @@ module.exports.answerQuestion = function(req, res) {
 module.exports.getProfileInfo = function(req, res) {
     var mentorId = req.params.mentorId;
     var sql = 'SELECT u.name, u.lastName, u.email, u.password, m.description, m.branchId FROM users u, mentors m WHERE u.userId = m.userId AND m.mentorId = ?';
-    var sqlBranch = 'SELECT b.branchName from mentorbranchs mb, branchs b WHERE mb.mentorId = ? AND b.branchId = mb.branchId';
-
     try {
         config.query(sql, [mentorId], (err, rows) => {
             if (err) throw err;
             if (rows.length > 0) {
-
-                config.query(sqlBranch, [mentorId], (err, rowsBranch) => {
-                    rows[0].branchs = rowsBranch;
-                    res.json(rows[0]);
-                    res.end();
-                });
-
+                res.json(rows[0]);
+                res.end();
             } else {
                 res.status(404)
             }
@@ -156,7 +149,7 @@ module.exports.getProfileInfo = function(req, res) {
 }
 
 module.exports.updateProfile = function(req, res) {
-    var sql = 'UPDATE users u, mentors m, mentorbranchs mb SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , m.description = ?, mb.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sql = 'UPDATE users u, mentors m SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , m.description = ?, m.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
     try {
         config.query(sql, [
                 req.body.Name,
