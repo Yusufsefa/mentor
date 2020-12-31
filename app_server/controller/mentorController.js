@@ -29,9 +29,9 @@ response: 200
 module.exports.register = function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
-    var Name = req.body.Name;
-    var LastName = req.body.LastName;
-    var description = req.body.Description;
+    var Name = req.body.name;
+    var LastName = req.body.lastName;
+    var description = req.body.description;
     var branchId = req.body.branchId;
 
     try {

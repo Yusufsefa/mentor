@@ -76,10 +76,10 @@ response: 200
 module.exports.register = async function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
-    var Name = req.body.Name;
-    var LastName = req.body.LastName;
+    var Name = req.body.name;
+    var LastName = req.body.lastName;
     var branchId = req.body.branchId;
-    var sql = 'INSERT INTO users(email, password, Name, LastName) VALUES (?,?,?,?)';
+    var sql = 'INSERT INTO users(email, password, name, lastName) VALUES (?,?,?,?)';
 
     config.query(sql, [email, password, Name, LastName], (err, row) => {
         if (err) throw err;
