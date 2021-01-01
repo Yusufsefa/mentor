@@ -153,8 +153,8 @@ module.exports.updateProfile = function(req, res) {
     var sql = 'UPDATE users u, students s SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , s.branchId = ? WHERE u.userId = s.userId AND s.studentId = ?';
     try {
         config.query(sql, [
-                req.body.Name,
-                req.body.LastName,
+                req.body.name,
+                req.body.lastName,
                 req.body.email,
                 req.body.password,
                 req.body.branchId,

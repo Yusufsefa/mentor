@@ -149,11 +149,11 @@ module.exports.getProfileInfo = function(req, res) {
 }
 
 module.exports.updateProfile = function(req, res) {
-    var sql = 'UPDATE users u, mentors m SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , m.description = ?, m.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
+    var sql = 'UPDATE users u, mentors m SET u.name = ?, u.lastName = ?, u.email = ?, u.password = ? , m.description = ?, m.branchId = ? WHERE u.userId = m.userId AND m.mentorId = ?';
     try {
         config.query(sql, [
-                req.body.Name,
-                req.body.LastName,
+                req.body.name,
+                req.body.lastName,
                 req.body.email,
                 req.body.password,
                 req.body.description,
