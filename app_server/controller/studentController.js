@@ -91,11 +91,12 @@ module.exports.register = async function(req, res) {
         config.query('SELECT MAX(userId) as "lastId" from users', (err, row) => {
             if (err) throw err;
             var lastId = JSON.stringify(row[0].lastId);
-            res.end();
+            
 
             config.query('INSERT INTO students(userId, branchId) VALUES (?,?)', [lastId, branchId], (err) => {
                 if (err) throw err;
                 res.status(200);
+                res.end();
             });
 
         });
@@ -106,23 +107,11 @@ module.exports.register = async function(req, res) {
 
 module.exports.getMentorInfo = function(req, res) {
 
-    var sql = 'SELECT u.name ,u.lastName, m.description, m.mentorId  FROM users u, students s, mentors m WHERE s.studentId = ? AND m.mentorId = s.mentorId AND m.userId = u.userId';
+    var sql = 'SELECT u.name ,u.lastName, m.description, m.mentorId, m.branchId  FROM users u, students s, mentors m WHERE s.studentId = ? AND m.mentorId = s.mentorId AND m.userId = u.userId';
     try {
         config.query(sql, [req.params.studentId], function(err, mentorData) {
             if (err) throw err;
-
-            if (mentorData.length > 0)
-                config.query('SELECT b.branchName FROM mentors m, branchs b WHERE m.branchId = b.branchId AND m.mentorId = ?', [mentorData[0].mentorId],
-                    (err, mentorBranch) => {
-
-                        mentorData[0].branch = mentorBranch[0];
-                        res.json(mentorData[0]);
-
-                    });
-            else {
-                res.status(404)
-            }
-
+            res.json(mentorData[0]);    
         });
 
     } catch (err) {

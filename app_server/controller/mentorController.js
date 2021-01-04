@@ -65,16 +65,17 @@ module.exports.register = function(req, res) {
 module.exports.getStudents = function(req, res) {
     var mentorId = req.params.mentorId;
     var sql = `SELECT 
-    concat(u.Name, ' ',u.LastName) as 'ad soyad',
-    u.email,
-    b.branchName
+    u.name,
+    u.lastName,
+    s.branchId,
+    u.email
     FROM students s, users u, branchs b
     WHERE s.userId=u.userId AND s.branchId=b.branchId AND s.mentorId=?`
     try {
         config.query(sql, [mentorId], (err, rows) => {
             if (err) throw err;
             if (rows.length > 0) {
-                res.json(rows[0])
+                res.json(rows)
             } else
                 res.status(404);
             res.end();
@@ -87,7 +88,7 @@ module.exports.getStudents = function(req, res) {
 
 module.exports.getQuestions = function(req, res) {
     var mentorId = req.params.mentorId;
-    var sql = `SELECT q.*, b.branchName FROM questions q, branchs b 
+    var sql = `SELECT q.*, b.branchName FROM questions q, branchs b
     WHERE q.branchId=b.branchId AND q.mentorId=?`;
     try {
         config.query(sql, [mentorId], (err, rows) => {
