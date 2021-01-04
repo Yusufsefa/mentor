@@ -12,10 +12,11 @@ module.exports.addQuestions = function(req, res) {
     var branchId = req.body.branchId;
     var studentId = req.body.studentId;
     var mentorId = req.body.mentorId;
+    var date = req.body.date;
 
-    var sql = 'INSERT INTO questions(question, answer, branchId, studentId, mentorId) VALUES (?,?,?,?,?)'
+    var sql = 'INSERT INTO questions(question, answer, branchId, studentId, mentorId, date) VALUES (?,?,?,?,?,?)'
 
-    config.query(sql, [question, answer, branchId, studentId, mentorId], (err, result) => {
+    config.query(sql, [question, answer, branchId, studentId, mentorId, date], (err, result) => {
         if (err) throw err;
         res.write('Inserted...');
         res.end();
@@ -34,9 +35,11 @@ response:
 ]
 */
 module.exports.getQuestion = function(req, res) {
-    var sql = 'SELECT * FROM questions'
+    var studentId = req.params.studentId;
+
+    var sql = 'SELECT * FROM questions q, students s WHERE q.studentId = s.studentId AND s.studentId = ?'
     try {
-        config.query(sql, function(err, rows) {
+        config.query(sql,[studentId], function(err, rows) {
             if (err) throw err;
             res.json(rows);
         });
@@ -103,16 +106,16 @@ module.exports.register = async function(req, res) {
 
 module.exports.getMentorInfo = function(req, res) {
 
-    var sql = 'SELECT concat(u.Name, " ",u.LastName) as "ad soyad", m.description, m.mentorId  FROM users u, students s, mentors m WHERE s.studentId = ? AND m.mentorId = s.mentorId AND m.userId = u.userId';
+    var sql = 'SELECT u.name ,u.lastName, m.description, m.mentorId  FROM users u, students s, mentors m WHERE s.studentId = ? AND m.mentorId = s.mentorId AND m.userId = u.userId';
     try {
         config.query(sql, [req.params.studentId], function(err, mentorData) {
             if (err) throw err;
 
             if (mentorData.length > 0)
-                config.query('SELECT b.branchName FROM mentorbranchs mb, branchs b WHERE mb.branchId = b.branchId AND mb.mentorId = ?', [mentorData[0].mentorId],
+                config.query('SELECT b.branchName FROM mentors m, branchs b WHERE m.branchId = b.branchId AND m.mentorId = ?', [mentorData[0].mentorId],
                     (err, mentorBranch) => {
 
-                        mentorData[0].branchs = mentorBranch;
+                        mentorData[0].branch = mentorBranch[0];
                         res.json(mentorData[0]);
 
                     });
@@ -128,7 +131,7 @@ module.exports.getMentorInfo = function(req, res) {
 };
 
 module.exports.getProfileInfo = function(req, res) {
-    var sql = 'SELECT u.Name, u.LastName, u.email, s.branchId, u.password from users u, students s WHERE s.userId = u.userId AND s.studentId = ?'
+    var sql = 'SELECT u.Name, u.LastName, u.email, s.branchId, u.password, s.mentorId from users u, students s WHERE s.userId = u.userId AND s.studentId = ?'
     try {
         config.query(sql, [req.params.studentId], function(err, rows) {
             if (err) throw err;
