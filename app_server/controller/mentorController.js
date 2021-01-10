@@ -64,13 +64,7 @@ module.exports.register = function(req, res) {
 
 module.exports.getStudents = function(req, res) {
     var mentorId = req.params.mentorId;
-    var sql = `SELECT 
-    u.name,
-    u.lastName,
-    s.branchId,
-    u.email
-    FROM students s, users u, branchs b
-    WHERE s.userId=u.userId AND s.branchId=b.branchId AND s.mentorId=?`
+    var sql = `SELECT * from mentorStudents Where mentorId=?`
     try {
         config.query(sql, [mentorId], (err, rows) => {
             if (err) throw err;

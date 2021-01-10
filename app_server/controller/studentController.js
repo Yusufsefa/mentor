@@ -6,7 +6,7 @@ question, id
 response: 
 200
 */
-module.exports.addQuestions = function(req, res) {
+module.exports.addQuestions = function (req, res) {
     var question = req.body.question;
     var answer = req.body.answer;
     var branchId = req.body.branchId;
@@ -34,12 +34,12 @@ response:
     }
 ]
 */
-module.exports.getQuestion = function(req, res) {
+module.exports.getQuestion = function (req, res) {
     var studentId = req.params.studentId;
 
     var sql = 'SELECT * FROM questions q, students s WHERE q.studentId = s.studentId AND s.studentId = ?'
     try {
-        config.query(sql,[studentId], function(err, rows) {
+        config.query(sql, [studentId], function (err, rows) {
             if (err) throw err;
             res.json(rows);
         });
@@ -54,10 +54,10 @@ module.exports.getQuestion = function(req, res) {
 req: username, password
 response: 200 - { kullaniciId }, 403 
 */
-module.exports.login = function(req, res) {
+module.exports.login = function (req, res) {
     var sql = 'SELECT s.studentId FROM users u, students s WHERE u.email = ? AND u.password = ? AND u.userId = s.userId';
     try {
-        config.query(sql, [req.body.email, req.body.password], function(err, rows) {
+        config.query(sql, [req.body.email, req.body.password], function (err, rows) {
             if (err) throw err;
             if (rows.length > 0)
                 res.json(rows[0]);
@@ -76,7 +76,7 @@ module.exports.login = function(req, res) {
 req: ad, soyad, mail, şifre, alanId
 response: 200
 */
-module.exports.register = async function(req, res) {
+module.exports.register = async function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
     var Name = req.body.name;
@@ -86,32 +86,33 @@ module.exports.register = async function(req, res) {
 
     config.query(sql, [email, password, Name, LastName], (err, row) => {
         if (err) throw err;
-        res.write('Inserted..')
 
         config.query('SELECT MAX(userId) as "lastId" from users', (err, row) => {
             if (err) throw err;
             var lastId = JSON.stringify(row[0].lastId);
-            
-
             config.query('INSERT INTO students(userId, branchId) VALUES (?,?)', [lastId, branchId], (err) => {
                 if (err) throw err;
-                res.status(200);
-                res.end();
+                config.query('SELECT MAX(studentId) as "lastStudentId" from students', (err, row) => {
+                    if (err) throw err;
+                    var lastStudentId = JSON.stringify(row[0].lastStudentId);
+                    config.query('CALL studentMentorMatch(?)', [lastStudentId], (err, row) => {
+                        if (err) throw err;
+                        res.status(200);
+                        res.end();
+                    });
+                });
             });
-
         });
-
     });
-
 };
 
-module.exports.getMentorInfo = function(req, res) {
+module.exports.getMentorInfo = function (req, res) {
 
-    var sql = 'SELECT u.name ,u.lastName, m.description, m.mentorId, m.branchId  FROM users u, students s, mentors m WHERE s.studentId = ? AND m.mentorId = s.mentorId AND m.userId = u.userId';
+    var sql = 'SELECT * FROM studentmentor WHERE studentId=?';
     try {
-        config.query(sql, [req.params.studentId], function(err, mentorData) {
+        config.query(sql, [req.params.studentId], function (err, mentorData) {
             if (err) throw err;
-            res.json(mentorData[0]);    
+            res.json(mentorData[0]);
         });
 
     } catch (err) {
@@ -119,10 +120,10 @@ module.exports.getMentorInfo = function(req, res) {
     }
 };
 
-module.exports.getProfileInfo = function(req, res) {
+module.exports.getProfileInfo = function (req, res) {
     var sql = 'SELECT u.Name, u.LastName, u.email, s.branchId, u.password, s.mentorId from users u, students s WHERE s.userId = u.userId AND s.studentId = ?'
     try {
-        config.query(sql, [req.params.studentId], function(err, rows) {
+        config.query(sql, [req.params.studentId], function (err, rows) {
             if (err) throw err;
 
             if (rows.length > 0)
@@ -141,18 +142,18 @@ module.exports.getProfileInfo = function(req, res) {
 
 };
 
-module.exports.updateProfile = function(req, res) {
+module.exports.updateProfile = function (req, res) {
     var sql = 'UPDATE users u, students s SET u.Name = ?, u.LastName = ?, u.email = ?, u.password = ? , s.branchId = ? WHERE u.userId = s.userId AND s.studentId = ?';
     try {
         config.query(sql, [
-                req.body.name,
-                req.body.lastName,
-                req.body.email,
-                req.body.password,
-                req.body.branchId,
-                req.params.studentId
-            ],
-            function(err, rows) {
+            req.body.name,
+            req.body.lastName,
+            req.body.email,
+            req.body.password,
+            req.body.branchId,
+            req.params.studentId
+        ],
+            function (err, rows) {
                 if (err) throw err;
                 res.write('Updated...');
                 res.end();
