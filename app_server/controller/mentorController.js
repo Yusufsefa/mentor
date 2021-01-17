@@ -71,7 +71,7 @@ module.exports.getStudents = function(req, res) {
             if (rows.length > 0) {
                 res.json(rows)
             } else
-                res.status(404);
+                res.status(204);
             res.end();
         });
     } catch (err) {
@@ -90,7 +90,7 @@ module.exports.getQuestions = function(req, res) {
             if (rows.length > 0)
                 res.json(rows);
             else
-                res.status(404);
+                res.status(204);
             res.end();
         });
 
